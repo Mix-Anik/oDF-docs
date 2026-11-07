@@ -1,0 +1,22 @@
+{
+	"name": "odf-docs",
+	"private": true,
+	"version": "0.0.1",
+	"scripts": {
+		"gen": "node scripts/gen-api.mjs",
+		"start": "npm run gen && docusaurus start",
+		"build": "npm run gen && docusaurus build",
+		"serve": "docusaurus serve",
+		"clear": "docusaurus clear"
+	},
+	"dependencies": {
+		"@docusaurus/core": "3.10.2",
+		"@docusaurus/preset-classic": "3.10.2",
+		"@easyops-cn/docusaurus-search-local": "0.55.3",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0"
+	},
+	"engines": {
+		"node": ">=20"
+	}
+}

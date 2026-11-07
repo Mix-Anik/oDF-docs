@@ -1,0 +1,37 @@
+:root {
+	--ifm-color-primary: #c2410c;
+	--ifm-color-primary-dark: #ae3b0b;
+	--ifm-color-primary-darker: #a4370b;
+	--ifm-color-primary-darkest: #862d09;
+	--ifm-color-primary-light: #d6490e;
+	--ifm-color-primary-lighter: #e04e0f;
+	--ifm-color-primary-lightest: #f2622a;
+	--ifm-code-font-size: 92%;
+}
+
+[data-theme='dark'] {
+	--ifm-color-primary: #fb923c;
+	--ifm-color-primary-dark: #fa7d1a;
+	--ifm-color-primary-darker: #fa7309;
+	--ifm-color-primary-darkest: #d15d05;
+	--ifm-color-primary-light: #fca75f;
+	--ifm-color-primary-lighter: #fcb170;
+	--ifm-color-primary-lightest: #fdcba0;
+}
+
+/* The API reference: a function is a heading, a row of badges, its signature and a table of parameters. */
+.markdown h3 {
+	margin-top: 2.5rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--ifm-toc-border-color);
+}
+
+.markdown .badge {
+	margin-right: 0.35rem;
+	font-weight: 600;
+}
+
+.markdown table {
+	display: table;
+	width: 100%;
+}
