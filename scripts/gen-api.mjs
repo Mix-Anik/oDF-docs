@@ -27,7 +27,8 @@ for (const python of candidates) {
 	for (const shell of shells) {
 		const probe = spawnSync(python, ['--version'], { encoding: 'utf8', shell });
 		if (probe.status !== 0 || !/^Python 3/.test(probe.stdout + probe.stderr)) continue;
-		const r = spawnSync(python, ['gen_api.py', '--json', JSON.stringify(data)], { cwd: apiDir, stdio: 'inherit', shell });
+		// with a shell the path has to be quoted (spaces); without one the quotes would become part of it
+		const r = spawnSync(python, ['gen_api.py', '--json', shell ? JSON.stringify(data) : data], { cwd: apiDir, stdio: 'inherit', shell });
 		if (r.status !== 0) process.exit(r.status ?? 1);
 		renderApi(data, out);
 		process.exit(0);
