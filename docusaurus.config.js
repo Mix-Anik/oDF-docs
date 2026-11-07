@@ -12,7 +12,7 @@ const config = {
 	projectName: 'oDF-docs',
 	trailingSlash: false,
 	onBrokenLinks: 'throw',
-	onBrokenAnchors: 'warn',
+	onBrokenAnchors: 'throw',
 
 	// Hand-written pages are plain markdown (C code and braces are not JSX); the generated API pages are .mdx.
 	markdown: { format: 'detect' },

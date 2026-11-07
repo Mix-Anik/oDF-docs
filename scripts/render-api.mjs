@@ -1,81 +1,29 @@
 // Renders the API data of the engine (client.json / server.json, written by `gen_api.py --json`) into MDX pages for the
 // reference section. Everything about how it looks is decided here; the engine only says what the API is.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
-
-const PAGES = [
-	{ file: 'client', title: 'Client plugin API', kind: 'client', position: 1 },
-	{ file: 'server', title: 'Server plugin API', kind: 'server', position: 2 },
-];
+import { badge, cap1, code, inline, prose, typeCell } from './text.mjs';
 
 const WRAP = 100; // a signature longer than this gets a line for each parameter
 
-const slug = (name) => name.toLowerCase();
-const code = (text) => '`' + text + '`';
-const cap1 = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+/** Makes the functions and handler types of the API known to the linker (they are the targets of links on the page). */
+export function registerApi(api, file, linker) {
+	for (const f of api.funcs) linker.add(f.name, file, 'func');
+	for (const h of api.handlers) linker.add(h.name, file, 'func');
+}
 
-/** Text that is not code, safe for MDX (no tags, no expressions) and for markdown (no emphasis, no table breaks). */
-const esc = (text) =>
-	text
-		.replaceAll('&', '&amp;')
-		.replaceAll('<', '&lt;')
-		.replaceAll('>', '&gt;')
-		.replaceAll('{', '&#123;')
-		.replaceAll('}', '&#125;')
-		.replaceAll('*', '\\*')
-		.replaceAll('_', '\\_')
-		.replaceAll('|', '\\|');
-
-const badge = (kind, text) => `<span className="badge badge--${kind}">${text}</span>`;
-
-// a call like Name( args ), a path like \key\value, or any other word
-const WORDS = /(?<call>\b[A-Za-z_][A-Za-z0-9_]*\(\s[^()]*\s\))|(?<path>(?:\\[A-Za-z0-9_]+){2,})|(?<word>\b[A-Za-z_][A-Za-z0-9_]*\*?)/g;
-
-class Page {
-	constructor(data) {
-		this.api = data;
-		this.names = new Set([...data.funcs.map((f) => f.name), ...data.handlers.map((h) => h.name)]);
-		this.restricted = new Set(data.caps.filter((c) => c.restricted).map((c) => c.name));
+export class ApiPage {
+	constructor(api, file, linker) {
+		this.api = api;
+		this.file = file;
+		this.linker = linker;
+		this.restricted = new Set(api.caps.filter((c) => c.restricted).map((c) => c.name));
 	}
 
-	/** A word of the comments that is code. A name of a single word (Print, Trace) is also an ordinary word, so it only
-	 * counts as one in a call: Print( text ). */
-	isCode(word, call) {
-		return word.endsWith('*') || word.includes('_') || word === 'NULL' || (call && this.names.has(word)) || /[a-z][A-Z]/.test(word);
-	}
-
-	/** A sentence of the comments: code-like words become code, names of functions links. */
 	inline(text, own) {
-		let out = '';
-		let pos = 0;
-		for (const m of text.matchAll(WORDS)) {
-			out += esc(text.slice(pos, m.index));
-			pos = m.index + m[0].length;
-			if (m.groups.path) {
-				out += code(m.groups.path);
-				continue;
-			}
-			const name = m.groups.call ?? m.groups.word;
-			const base = name.match(/^[A-Za-z0-9_]*/)[0];
-			if (!this.isCode(base, m.groups.call !== undefined)) out += esc(name);
-			else if (this.names.has(base) && base !== own && !name.endsWith('*')) out += `[${code(name)}](#${slug(base)})`;
-			else out += code(name);
-		}
-		return out + esc(text.slice(pos));
+		return inline(text, this.linker, this.file, own);
 	}
 
 	prose(lines, own) {
-		const paras = [];
-		let cur = [];
-		for (const line of lines) {
-			if (line.trim()) cur.push(line.trim());
-			else if (cur.length) {
-				paras.push(cur.join(' '));
-				cur = [];
-			}
-		}
-		if (cur.length) paras.push(cur.join(' '));
-		return paras.map((p) => this.inline(p, own)).join('\n\n');
+		return prose(lines, this.linker, this.file, own);
 	}
 
 	// -- parameters ---------------------------------------------------------------------------------------------------
@@ -84,7 +32,7 @@ class Page {
 		const note = [];
 		if (p.kind === 'str') note.push('string');
 		else if (p.kind === 'strv') note.push(`${code(p.count)} strings`);
-		else if (p.kind === 'fn') note.push(`handler, see [${code(p.ctype)}](#${slug(p.ctype)})`);
+		else if (p.kind === 'fn') note.push(`handler, see ${this.linker.link(p.ctype, this.file)}`);
 		else if (p.kind === 'ptrin' || p.kind === 'ptrout') {
 			const direction = p.kind === 'ptrin' ? 'the engine reads it' : 'the engine writes it';
 			const size = typeof p.count === 'number' ? String(p.count) : code(p.count);
@@ -103,12 +51,12 @@ class Page {
 		const rows = params.flatMap((p) =>
 			p.kind === 'i64'
 				? [
-						[p.name + 'Lo', 'unsigned', 'low half of a 64 bit number'],
-						[p.name + 'Hi', 'unsigned', 'high half'],
+						[p.name + 'Lo', code('unsigned'), 'low half of a 64 bit number'],
+						[p.name + 'Hi', code('unsigned'), 'high half'],
 					]
-				: [[p.name, p.cType, this.paramNote(p)]],
+				: [[p.name, typeCell(p.cType, this.linker, this.file), this.paramNote(p)]],
 		);
-		const lines = rows.map(([n, t, note]) => `| ${code(n)} | ${code(t)} | ${note.replaceAll('|', '\\|')} |`);
+		const lines = rows.map(([n, t, note]) => `| ${code(n)} | ${t} | ${note.replaceAll('|', '\\|')} |`);
 		return ['| Parameter | Type | Notes |', '|---|---|---|', ...lines, ''];
 	}
 
@@ -180,7 +128,7 @@ class Page {
 		return [cap1(m[1]), intro];
 	}
 
-	render({ title, kind, position }) {
+	render({ title, kind, position, typesFile }) {
 		const api = this.api;
 		const o = [
 			'---',
@@ -192,7 +140,7 @@ class Page {
 			'',
 			`{/* Generated from ${api.source} by scripts/render-api.mjs - do not edit. */}`,
 			'',
-			`Version ${api.version} of the ${kind} plugin API. Include ${code(api.module + '.h')} in a plugin; the functions and handlers below are what it calls and what it implements. This page is generated from ${code(api.source)} of the engine, which is also what the engine enforces.`,
+			`Version ${api.version} of the ${kind} plugin API. Include ${code(api.module + '.h')} in a plugin; the functions and handlers below are what it calls and what it implements. The structures and constants they use are in [${cap1(kind)} types](${typesFile}). This page is generated from ${code(api.source)} of the engine, which is also what the engine enforces.`,
 			'',
 		];
 		if (api.caps.length) {
@@ -230,14 +178,5 @@ class Page {
 			for (const e of api.events) o.push(...this.event(e));
 		}
 		return o.join('\n').replace(/\n+$/, '') + '\n';
-	}
-}
-
-export function renderApi(dataDir, outDir) {
-	mkdirSync(outDir, { recursive: true });
-	for (const page of PAGES) {
-		const data = JSON.parse(readFileSync(join(dataDir, page.file + '.json'), 'utf8'));
-		writeFileSync(join(outDir, page.file + '.mdx'), new Page(data).render(page));
-		console.log('wrote ' + page.file + '.mdx');
 	}
 }

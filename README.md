@@ -12,10 +12,18 @@ npm run build    # static site into build/
 ## Layout
 
 * `docs/` the pages (markdown; `.md` is plain markdown, so C code and braces are safe). Add a page and list it in `sidebars.js`.
-* `docs/plugins/api/` **generated, not committed**: the client and server plugin API reference. `npm start` / `npm run build` run
-  `scripts/gen-api.mjs`, which asks the engine repo (oDFe-upstream) for its API as data (`code/plugin_api/gen_api.py --json`,
-  from `client.api` and `server.api`) and renders the pages with `scripts/render-api.mjs`. The engine only says *what* the API
-  is; how it looks (badges, tables, links) is decided here. The reference always matches the engine it was generated from.
+* `content/examples/` the example pages, written by hand. A line `{{source name.c}}` in one is replaced by that file of the
+  engine's SDK examples (`code/plugin_api/sdk/examples`), so the code shown is the code the engine's CI builds.
+* `docs/plugins/api/` and `docs/plugins/examples/` **generated, not committed**. `npm start` / `npm run build` run
+  `scripts/generate.mjs`, which takes from the engine repo (oDFe-upstream)
+  * the functions, handlers, events and capabilities, as data (`code/plugin_api/gen_api.py --json`, from `client.api` and
+    `server.api`) -> `scripts/render-api.mjs`;
+  * the structures and constants, read from its type headers (`odfc_types.h`, `odfs_types.h`; their comments are the
+    descriptions) -> `scripts/render-types.mjs`;
+  * the example sources -> `scripts/render-examples.mjs`.
+
+  The engine only says *what* the API is; how it looks (badges, tables, links between pages) is decided here. A link to a
+  function or an anchor that no longer exists in the engine fails the build, so the pages cannot silently go out of date.
 
 The engine repo is looked up at `ODFE_DIR` (default `../oDFe-upstream`); the Python interpreter can be set with `PYTHON`.
 

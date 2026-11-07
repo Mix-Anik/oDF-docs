@@ -3,7 +3,7 @@
 	"private": true,
 	"version": "0.0.1",
 	"scripts": {
-		"gen": "node scripts/gen-api.mjs",
+		"gen": "node scripts/generate.mjs",
 		"start": "npm run gen && docusaurus start",
 		"build": "npm run gen && docusaurus build",
 		"serve": "docusaurus serve",
