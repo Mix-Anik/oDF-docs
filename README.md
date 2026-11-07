@@ -21,6 +21,6 @@ The engine repo is looked up at `ODFE_DIR` (default `../oDFe-upstream`); the Pyt
 
 ## Publishing
 
-`.github/workflows/deploy.yml` builds and deploys on every push to `main`, and can be started by hand (with the engine branch or
+`.github/workflows/deploy.yml` builds and deploys on every push to `master`, and can be started by hand (with the engine branch or
 tag to take the API from) or by a `repository_dispatch` of type `engine-changed`. In the repository settings, Pages needs the
 source **GitHub Actions**.

@@ -2,12 +2,12 @@ name: Deploy docs
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
     inputs:
       engine_ref:
         description: oDFe-upstream branch or tag the API reference is generated from
-        default: main
+        default: feature/qvm-plugins
   # the engine repo can send this when client.api / server.api change
   repository_dispatch:
     types: [engine-changed]
@@ -31,7 +31,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Mix-Anik/oDFe-upstream
-          ref: ${{ inputs.engine_ref || 'main' }}
+          # the plugin API is not on the engine's main yet; switch this (and the input default) to main once it is merged
+          ref: ${{ inputs.engine_ref || 'feature/qvm-plugins' }}
           path: engine
           sparse-checkout: code/plugin_api
 

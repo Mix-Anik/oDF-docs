@@ -25,7 +25,7 @@ const config = {
 				docs: {
 					routeBasePath: '/',
 					sidebarPath: './sidebars.js',
-					editUrl: 'https://github.com/Mix-Anik/oDF-docs/edit/main/',
+					editUrl: 'https://github.com/Mix-Anik/oDF-docs/edit/master/',
 				},
 				blog: false,
 				theme: { customCss: './src/css/custom.css' },
