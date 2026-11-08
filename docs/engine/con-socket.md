@@ -7,11 +7,12 @@ The console socket lets another program on the same machine read everything the 
 
 ## Security: read this first
 
-* The socket listens on **127.0.0.1 only**, so only programs on the same machine can connect.
+* It is **off by default**. You turn it on yourself, when you need it (see [Settings](#settings)).
+* The socket listens on **127.0.0.1 only**, so players and other machines cannot connect to it.
 * There is **no password**. Any program on that machine, of any user, that connects can run **any console command** the engine can run, as if typed at the console.
-* It is **on by default** (`con_socket_enabled 1`).
+* A **web page** open in a browser on that machine can reach it too: the browser can send a request to `http://127.0.0.1:<port>` with commands in its body, and each line of it is run. So do not leave it on while the engine is open and you browse, and never on a machine that other people use.
 
-On a machine shared with other people, or where you do not trust everything that runs, turn it off with `con_socket_enabled 0` in your config, or at least change the port.
+Turn it on for the time you use it, and off again afterwards.
 
 ## Using it
 
@@ -54,8 +55,10 @@ When a program connects, the console of the engine prints `Console client connec
 
 | Cvar or command | Default | |
 |---|---|---|
-| `con_socket_enabled` | `1` | switches the socket on and off. Saved in the config. |
+| `con_socket_enabled` | `0` | switches the socket on and off. Saved in the config, so once you set it to 1 it stays on until you set it back. |
 | `con_socket_port` | `9999` | the TCP port, 1024 to 65535. A value outside that range gives a warning and the default is used. Saved in the config. |
 | `con_socket_restart` | | closes the socket and opens it again. Use it after changing the two cvars above while the engine runs; they are only read when the socket starts. |
 
-The socket opens at the end of the engine's start, and prints `Console socket listening on 127.0.0.1:<port>` when it does. If the port is already used (a second copy of the engine, say), nothing is printed and no socket opens: change `con_socket_port` for one of them.
+**To turn it on** while the engine runs, type `con_socket_enabled 1` and then `con_socket_restart`. To turn it off, `con_socket_enabled 0` and `con_socket_restart`.
+
+When enabled, the socket opens at the end of the engine's start, and prints `Console socket listening on 127.0.0.1:<port>` when it does. If the port is already used (a second copy of the engine, say), nothing is printed and no socket opens: change `con_socket_port` for one of them.
