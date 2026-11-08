@@ -55,7 +55,7 @@ A plugin runs in a [sandbox](architecture.mdx):
 
 * it has no files, no network and no system calls of its own, only the functions of the capabilities you gave it;
 * it cannot read or write memory that is not its own, or the data of the game module;
-* a call has a budget of instructions (5 million for a call, 100 million for the start): a loop that never ends stops the plugin, not the server;
+* a call has a budget of instructions (5 million for a call, 100 million for the start): a loop that never ends stops the plugin, not the server. The work the engine does for a plugin (files, web requests, shaders, snapshots) has an allowance per call too, so a plugin cannot keep the server busy by asking for a lot of it;
 * a bad pointer, a division by zero or a call of a function it was not given stops that plugin and only that plugin. It is not called again until the server restarts, and the console says which plugin and why.
 
 Everything runs on the main thread of the server, so a handler and `OnFrame` must not block. Requests to the web are made by the engine, and the answer is given to the plugin in a later frame.
@@ -68,7 +68,7 @@ In the server console:
 
 ```
 plugins           what was loaded, and why something is not running
-plugins stats     how much time each plugin has used, per function
+plugins stats     how much time each plugin has used, per function, and the most steps and engine work one call used (of 5 million)
 ```
 
 ## Events and chat commands

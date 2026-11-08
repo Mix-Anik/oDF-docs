@@ -19,7 +19,7 @@ Follow a plugin through its life in the picture:
 3. **Plugin calls the engine (imports).** Every engine function a plugin calls, `Trace`, `Print`, `HttpRequest`, goes through the same generated glue. Before the function runs, the glue checks that each pointer and size lies inside the plugin's memory, that the capability the function belongs to was granted, and, for functions marked `cheat`, that cheats are allowed. A bad pointer or a missing capability is a fault and stops the plugin. The cheat rule is milder: the call does nothing and returns 0.
 4. **Engine calls the plugin (exports).** The plugin never runs on its own: the engine calls the functions it exports (`OnInit`, `OnFrame`, `OnDraw3D`, an event handler, ...) at the moments it chooses. The glue copies strings and structures into the plugin's own I/O buffer, because the engine does not reach into plugin memory.
 5. **Data from the game module.** Some of what a plugin wants to read, such as the predicted state of the player or the path of a ghost, only the game module (cgame or game) knows. The mod hands it to the engine with extension syscalls it finds by name, `trap_ODF_*` and `trap_Event`. An engine without them, or a mod that does not publish, simply makes the matching function return 0.
-6. **When something goes wrong.** A bad pointer, a division by zero or a call that ran out of budget stops that plugin and only that plugin. The game goes on, and the console says which plugin stopped and why.
+6. **When something goes wrong.** A bad pointer, a division by zero or a call that ran out of budget (steps, or the work the engine does for it) stops that plugin and only that plugin. The game goes on, and the console says which plugin stopped and why.
 
 ### Client and server plugins
 

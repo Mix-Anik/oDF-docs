@@ -82,6 +82,9 @@ The code that runs a plugin is `code/qcommon/plugin_vm.c`, with small additions 
 * Every load and store of the compiled code is masked into one block of memory of the plugin.
 * Every engine function a plugin calls goes through one dispatcher generated from the `.api` files, which checks the pointers, the capabilities and the cheat rule before the engine code runs. See [How plugins fit in](architecture.mdx).
 * The budget of a call is counted in steps (a function call or a trip around a loop in the compiled code; 16 instructions in the interpreter).
+* The work the engine does for a call is counted too, in units of about 10 ns: 5 million for a call, 100 million for the start. The heavy functions (`MemSet` and `MemCpy` by size, the store, `HttpRequest`, shaders and models, `SnapshotCreate`, the demo calls) charge their units before they do the work with `PluginVM_Charge`, and a call that spends its allowance is stopped like one that ran out of steps. It is a count, not a clock, so a slow disk does not stop a plugin that a fast one would let run.
+* A division by zero stops the plugin. A divisor of -1 does not: the result is the wrapped one (`-x` for a division, 0 for a remainder, so `INT_MIN / -1` is `INT_MIN`), and the compiled code skips the `idiv` that would trap.
+* When an engine function called by a plugin ends in `Com_Error`, `Com_Error` first calls `PluginVM_Abort`, which marks that plugin as failed and clears its call state, so nothing points at the stack that the error unwinds.
 * On x86 and x86-64 plugins run compiled to native code (`tests/client_plugin/smoke.sh` times a real plugin both ways); on any other system they are interpreted.
 
 ## Tests

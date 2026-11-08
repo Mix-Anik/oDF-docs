@@ -58,7 +58,7 @@ hello World       runs the command of the plugin
 | `Multiple definitions` when building | a function of yours has the name of an engine function or of an export (`Print`, `OnInit`, ...): rename it |
 | the plugin is not in `clplugins` / `plugins` | the file is not in the `plugins` folder of the home path, or it is a server plugin in the client's folder (skipped without a message) |
 | it is listed but not running | `clplugins` / `plugins` says why: `OnInit` returned something other than 0, or the plugin asked for a capability it was not given (the console prints the line an operator would add) |
-| it ran and then stopped | a fault stopped it: a bad pointer, a division by zero, a call of a function it was not given, or it used up its budget. The console says which plugin and why; the game goes on. It runs again after a restart |
+| it ran and then stopped | a fault stopped it: a bad pointer, a division by zero, a call of a function it was not given, or it used up its budget of steps or of engine work. The console says which plugin and why; the game goes on. It runs again after a restart |
 | the C code does not compile | see the list below: it is C89 on a 32 bit machine |
 
 ## What to know about the language

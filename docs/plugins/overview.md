@@ -13,7 +13,7 @@ Whatever its author wrote:
 * **Read or write memory but its own.** Every access is masked into it, and the engine checks every pointer, string and size a plugin passes to a function. The dispatcher is generated from the API files, so no function has to do it by hand.
 * **Use a capability it was not given.** Client plugins get all of them (the player installs them knowingly). The operator of a server lists them per plugin: `+set sv_plugins "records:auth,chat,storage,http=api.example.com"`. The ones that give power over other people's data (`auth`, `ips`, `http`, `rawcmd`) are never given unless named.
 * **Use a function marked `cheat`** when cheats are not allowed. The engine decides, not the plugin.
-* **Run for ever.** Every call has a budget of instructions (5 million for a call, 100 million for the start), and a plugin that uses it up is stopped.
+* **Run for ever.** Every call has a budget of instructions (5 million for a call, 100 million for the start), and so does the work the engine does for it (files, web requests, shaders, snapshots): a plugin that uses either up is stopped.
 * **Take the game down.** A bad pointer, a division by zero, a jump to a place it may not go to, a stack overflow: the plugin is stopped (and not called again until the game restarts), the game goes on. The console says which plugin and why.
 
 Operators and players are responsible for the plugins they install.

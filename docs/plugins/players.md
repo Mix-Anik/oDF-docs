@@ -28,7 +28,7 @@ In the console:
 
 ```
 clplugins           lists every plugin found, whether it runs, and why not if it does not
-clplugins stats     the time each plugin has used, to find one that slows the game down
+clplugins stats     the time each plugin has used, to find one that slows the game down, and the most steps and engine work one call used (of 5 million)
 ```
 
 A plugin that does not run has a reason in that list: it could not start, it asked for something it is not allowed, or it was stopped after an error. The console also printed the reason at the moment it happened.
@@ -56,7 +56,7 @@ Some features are for cheats only by nature: saving and restoring the whole stat
 
 ## When a plugin stops
 
-A plugin that makes a mistake (a bad pointer, a division by zero, a call it may not make) or uses up its budget of instructions is stopped, and is not called again until the game restarts. The console says which plugin and why. Tell the author, or switch it off in the menu.
+A plugin that makes a mistake (a bad pointer, a division by zero, a call it may not make) or uses up its budget of instructions or of engine work is stopped, and is not called again until the game restarts. The console says which plugin and why. Tell the author, or switch it off in the menu.
 
 ## Logging in
 
