@@ -1,0 +1,52 @@
+---
+title: How plugins fit in
+sidebar_label: Architecture
+description: The big picture of the plugin system - the sandbox, the generated glue between plugin and engine, and where the API comes from.
+---
+
+import { RuntimeDiagram, SourceDiagram } from '@site/src/components/Diagrams';
+
+A plugin is a program the engine runs, but it is not trusted with the engine. This page shows the two things to keep in mind when reading the rest of these docs: **what stands between a plugin and the engine**, and **where the API itself comes from**.
+
+## At run time
+
+<RuntimeDiagram />
+
+Follow a plugin through its life in the picture:
+
+1. **Loading.** The engine finds `name.qvm` in the `plugins` folder of the home path, checks the file and reads its manifest (the version and the capabilities it asks for). A server plugin is only loaded if the operator named it in `sv_plugins`, and not if it asks for a capability the operator did not give. A client plugin is loaded unless the player switched it off.
+2. **The sandbox.** The plugin is a QVM program: it can only read and write one block of memory of its own, has no system calls, and runs under a budget of steps. On x86 and x86-64 it runs as native code, elsewhere it is interpreted, with the same rules.
+3. **Plugin calls the engine (imports).** Every engine function a plugin calls, `Trace`, `Print`, `HttpRequest`, goes through the same generated glue. Before the function runs, the glue checks that each pointer and size lies inside the plugin's memory, that the capability the function belongs to was granted, and, for functions marked `cheat`, that cheats are allowed. A bad pointer or a missing capability is a fault and stops the plugin. The cheat rule is milder: the call does nothing and returns 0.
+4. **Engine calls the plugin (exports).** The plugin never runs on its own: the engine calls the functions it exports (`OnInit`, `OnFrame`, `OnDraw3D`, an event handler, ...) at the moments it chooses. The glue copies strings and structures into the plugin's own I/O buffer, because the engine does not reach into plugin memory.
+5. **Data from the game module.** Some of what a plugin wants to read, such as the predicted state of the player or the path of a ghost, only the game module (cgame or game) knows. The mod hands it to the engine with extension syscalls it finds by name, `trap_ODF_*` and `trap_Event`. An engine without them, or a mod that does not publish, simply makes the matching function return 0.
+6. **When something goes wrong.** A bad pointer, a division by zero or a call that ran out of budget stops that plugin and only that plugin. The game goes on, and the console says which plugin stopped and why.
+
+### Client and server plugins
+
+Both kinds use the same machinery. What differs is who decides what a plugin may do, and what drives it:
+
+| | Client plugin | Server plugin |
+|---|---|---|
+| **Loaded** | all of them, except the ones in `plugins/disabled` | the ones named in `sv_plugins` |
+| **Capabilities** | all (the player installs them knowingly) | per plugin, listed by the operator; the restricted ones only if named |
+| **Called** | on map load, twice per frame to draw, for sounds, when the game is moved | at start, every server frame, for events, chat commands and HTTP answers |
+| **Data comes from** | the snapshot the game shows, and what the game module publishes | the connected clients, and the events the game module raises |
+| **Cheat rule** | functions marked `cheat` work only in a demo or with `sv_cheats 1` | none of the server functions are marked |
+
+## Where the API comes from
+
+<SourceDiagram />
+
+The interface between engine and plugin is written down **once**, in `client.api` and `server.api` in the engine repository. A script generates everything that has to agree with it:
+
+* the **headers** a plugin includes (`odfc.h`, `odfs.h`) with the declarations and the syscall stubs;
+* the **checked dispatcher** and the export calls the engine runs, which is the generated glue of the picture;
+* the data for the **API reference** in these docs, rendered on every build of this site.
+
+So a function cannot exist in the headers and be missing in the engine, and a new function cannot skip the pointer checks because nobody wrote them: the checks come out of the description. The tests of the engine fail when the generated files are not current.
+
+## Where to go next
+
+* [Plugin overview](overview.md): the sandbox rules in detail.
+* [Examples](examples/index.md): small plugins with their source, explained.
+* [Client API](api/client.mdx) and [Server API](api/server.mdx): every function, handler and event.

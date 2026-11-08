@@ -9,6 +9,65 @@
 	--ifm-code-font-size: 92%;
 }
 
+/* Light theme. Not one colour made lighter or darker, but layers, as in most good docs sites:
+     header    muted warm charcoal, the frame of the page (the footer matches)
+     sidebar   a tinted panel
+     page      a soft cream, never pure white
+     cards     a step lighter than the page (tables, the boxes of the figures)
+     code      dark blocks, so the code is what the eye finds first */
+[data-theme='light'] {
+	--ifm-background-color: #f4f1ea;
+	--ifm-background-surface-color: #fbfaf6;
+	--ifm-font-color-base: #2b2f38;
+	--ifm-heading-color: #1b2230;
+	--ifm-code-background: #e6e0d2;
+	--ifm-table-stripe-background: #f0ece3;
+	--ifm-color-emphasis-200: #e4dfd3;
+	--ifm-color-emphasis-300: #d5cfc0;
+	--ifm-toc-border-color: #d9d3c4;
+
+	--ifm-navbar-background-color: #3b3732;
+	--ifm-navbar-link-color: #efebe4;
+	--ifm-navbar-link-hover-color: #ffb37d;
+	--ifm-navbar-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+
+	--ifm-menu-color: #3b4252;
+	--ifm-menu-color-active: #a8380c;
+	--ifm-menu-color-background-hover: rgba(35, 44, 61, 0.07);
+	--ifm-menu-color-background-active: rgba(194, 65, 12, 0.12);
+
+	--ifm-color-primary: #b43d0c;
+	--ifm-color-primary-dark: #a2370b;
+	--ifm-color-primary-darker: #993409;
+	--ifm-color-primary-darkest: #7e2b08;
+	--ifm-color-primary-light: #c64310;
+	--ifm-color-primary-lighter: #cf4711;
+	--ifm-color-primary-lightest: #e0521a;
+}
+
+/* the footer defines its own blue on the element, so it is set there */
+[data-theme='light'] .footer--dark {
+	--ifm-footer-background-color: #302d29;
+}
+
+[data-theme='dark'] .footer--dark {
+	--ifm-footer-background-color: #1d1d20;
+}
+
+[data-theme='light'] .theme-doc-sidebar-container {
+	background: #e9e4d8;
+	border-right: 1px solid #d5cfc0;
+}
+
+[data-theme='light'] .navbar__title,
+[data-theme='light'] .navbar__item {
+	color: var(--ifm-navbar-link-color);
+}
+
+[data-theme='light'] .navbar__link--active {
+	color: #ffb37d;
+}
+
 [data-theme='dark'] {
 	--ifm-color-primary: #fb923c;
 	--ifm-color-primary-dark: #fa7d1a;
@@ -40,4 +99,119 @@
 .markdown .note-engine {
 	color: var(--ifm-color-emphasis-700);
 	font-size: 0.85em;
+}
+
+/* Architecture figures (src/components/Diagrams.js): drawn with the colours of the theme, so they follow light and dark. */
+.dg {
+	margin: 1.5rem 0 2rem;
+}
+
+.dg svg {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-width: 960px;
+	margin: 0 auto;
+	color: var(--ifm-font-color-base);
+	font-family: var(--ifm-font-family-base);
+	font-size: 13.5px;
+}
+
+.dg text {
+	fill: currentColor;
+}
+
+.dg .t {
+	font-size: 14.5px;
+	font-weight: 600;
+}
+
+.dg .h {
+	font-weight: 600;
+}
+
+.dg .m {
+	fill: var(--ifm-color-emphasis-700);
+	font-size: 13px;
+}
+
+.dg .z {
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	fill: var(--ifm-color-emphasis-700);
+}
+
+.dg .z.accent {
+	fill: var(--ifm-color-primary);
+}
+
+.dg .box {
+	fill: var(--ifm-background-surface-color);
+	stroke: var(--ifm-color-emphasis-500);
+	stroke-width: 1.2;
+}
+
+.dg .box.accent {
+	stroke: var(--ifm-color-primary);
+	stroke-width: 2;
+}
+
+.dg .zone {
+	fill: none;
+	stroke: var(--ifm-color-emphasis-400);
+	stroke-width: 1.2;
+	stroke-dasharray: 2 4;
+}
+
+.dg .zone.sandbox {
+	fill: color-mix(in srgb, var(--ifm-color-primary) 7%, transparent);
+	stroke: var(--ifm-color-primary);
+	stroke-width: 1.5;
+	stroke-dasharray: 7 4;
+}
+
+.dg .rule {
+	stroke: var(--ifm-color-emphasis-300);
+	stroke-width: 1;
+}
+
+.dg .arrow {
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.6;
+}
+
+.dg .arrow.dashed {
+	stroke-dasharray: 5 4;
+}
+
+.dg figcaption {
+	max-width: 960px;
+	margin: 0.75rem auto 0;
+	font-size: 0.9rem;
+	color: var(--ifm-color-emphasis-700);
+	text-align: center;
+}
+
+/* the figures are drawn wide: let them use a little more than the text column where there is room */
+@media (min-width: 997px) {
+	.dg {
+		margin-left: -1.5rem;
+		margin-right: -1.5rem;
+	}
+}
+
+/* the colour mode button sits on the dark header */
+[data-theme='light'] .navbar [class*='toggleButton'] {
+	color: var(--ifm-navbar-link-color);
+}
+
+[data-theme='light'] .navbar [class*='toggleButton']:hover {
+	background: rgba(255, 255, 255, 0.12);
+}
+
+/* comments of the dark code themes are faint */
+.theme-code-block .token.comment {
+	color: #8794ab !important;
 }

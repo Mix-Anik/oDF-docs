@@ -53,7 +53,7 @@ const config = {
 			},
 			footer: { style: 'dark', copyright: 'oDF documentation' },
 			prism: {
-				theme: themes.github,
+				theme: themes.oneDark,
 				darkTheme: themes.dracula,
 				additionalLanguages: ['c', 'bash'],
 			},

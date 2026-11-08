@@ -9,6 +9,7 @@ const sidebars = {
 			link: { type: 'doc', id: 'plugins/overview' },
 			items: [
 				'plugins/overview',
+				'plugins/architecture',
 				{
 					type: 'category',
 					label: 'Examples',

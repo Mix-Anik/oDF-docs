@@ -20,4 +20,5 @@ Operators and players are responsible for the plugins they install.
 
 ## Where to go next
 
+* [Architecture](architecture.mdx): the big picture, with diagrams of the sandbox and of where the API comes from.
 * [Client API](api/client.mdx) and [Server API](api/server.mdx): every function, handler and event.

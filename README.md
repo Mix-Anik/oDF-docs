@@ -12,6 +12,9 @@ npm run build    # static site into build/
 ## Layout
 
 * `docs/` the pages (markdown; `.md` is plain markdown, so C code and braces are safe). Add a page and list it in `sidebars.js`.
+* `src/components/Diagrams.js` the architecture figures (inline SVG, styled by `.dg` in `src/css/custom.css`, so they follow the light
+  and dark theme), used by `docs/plugins/architecture.mdx`. A figure is a claim about the system: when the engine changes how a call
+  crosses the sandbox, change the figure with it.
 * `content/examples/` the example pages, written by hand. A line `{{source name.c}}` in one is replaced by that file of the
   engine's SDK examples (`code/plugin_api/sdk/examples`), so the code shown is the code the engine's CI builds.
 * `content/param-notes.txt` what each parameter of the API is for (`Function.parameter: text`), the Description column of the
