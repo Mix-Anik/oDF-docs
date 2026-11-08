@@ -10,6 +10,9 @@ const sidebars = {
 			items: [
 				'plugins/overview',
 				'plugins/architecture',
+				'plugins/guides/getting-started',
+				'plugins/players',
+				'plugins/operators',
 				{
 					type: 'category',
 					label: 'Examples',
@@ -27,7 +30,13 @@ const sidebars = {
 					label: 'API reference',
 					items: ['plugins/api/client', 'plugins/api/client-types', 'plugins/api/server', 'plugins/api/server-types'],
 				},
+				'plugins/internals',
 			],
+		},
+		{
+			type: 'category',
+			label: 'Engine',
+			items: ['engine/login', 'engine/con-socket'],
 		},
 	],
 };

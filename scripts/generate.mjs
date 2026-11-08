@@ -20,6 +20,7 @@ const apiDir = resolve(engine, 'code/plugin_api');
 const data = resolve(root, '.api-data');
 const apiOut = resolve(root, 'docs/plugins/api');
 const examplesOut = resolve(root, 'docs/plugins/examples');
+const guidesOut = resolve(root, 'docs/plugins/guides');
 
 if (!existsSync(resolve(apiDir, 'gen_api.py'))) {
 	console.error(`gen_api.py not found in ${apiDir}\nCheck out oDFe-upstream and set ODFE_DIR to it.`);
@@ -54,6 +55,7 @@ const MODULES = [
 exportApi();
 rmSync(apiOut, { recursive: true, force: true });
 rmSync(examplesOut, { recursive: true, force: true });
+rmSync(guidesOut, { recursive: true, force: true });
 mkdirSync(apiOut, { recursive: true });
 
 // first everything that can be linked to, then the pages
@@ -83,3 +85,4 @@ for (const { kind, position, api, types, source, linker } of loaded) {
 
 notes.check();
 renderExamples(resolve(root, 'content/examples'), resolve(apiDir, 'sdk/examples'), examplesOut);
+renderExamples(resolve(root, 'content/guides'), resolve(apiDir, 'sdk/examples'), guidesOut);

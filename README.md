@@ -15,11 +15,12 @@ npm run build    # static site into build/
 * `src/components/Diagrams.js` the architecture figures (inline SVG, styled by `.dg` in `src/css/custom.css`, so they follow the light
   and dark theme), used by `docs/plugins/architecture.mdx`. A figure is a claim about the system: when the engine changes how a call
   crosses the sandbox, change the figure with it.
+* `content/guides/` guide pages that quote an example (Getting started): like the example pages, a line `{{source name.c}}` is replaced by that SDK example. Generated into `docs/plugins/guides/`.
 * `content/examples/` the example pages, written by hand. A line `{{source name.c}}` in one is replaced by that file of the
   engine's SDK examples (`code/plugin_api/sdk/examples`), so the code shown is the code the engine's CI builds.
 * `content/param-notes.txt` what each parameter of the API is for (`Function.parameter: text`), the Description column of the
   reference. A note for a function or parameter that no longer exists fails the build; a new parameter just has no note yet.
-* `docs/plugins/api/` and `docs/plugins/examples/` **generated, not committed**. `npm start` / `npm run build` run
+* `docs/plugins/api/`, `docs/plugins/examples/` and `docs/plugins/guides/` **generated, not committed**. `npm start` / `npm run build` run
   `scripts/generate.mjs`, which takes from the engine repo (oDFe-upstream)
   * the functions, handlers, events and capabilities, as data (`code/plugin_api/gen_api.py --json`, from `client.api` and
     `server.api`) -> `scripts/render-api.mjs`;

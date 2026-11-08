@@ -2,8 +2,9 @@
 // (code/plugin_api/sdk/examples). A line `{{source name.c}}` in a page is replaced by that file, so the code on the site is
 // the code the engine's CI builds, and a renamed or removed example breaks the build instead of the page.
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 
+/** Used for the example pages and for the guides that quote an example (content/guides). */
 export function renderExamples(templateDir, sourceDir, outDir) {
 	mkdirSync(outDir, { recursive: true });
 	for (const name of readdirSync(templateDir).filter((n) => n.endsWith('.md'))) {
@@ -13,6 +14,6 @@ export function renderExamples(templateDir, sourceDir, outDir) {
 			return '```c title="' + file + '"\n' + source + '\n```';
 		});
 		writeFileSync(join(outDir, name), text);
-		console.log('wrote examples/' + name);
+		console.log('wrote ' + basename(outDir) + '/' + name);
 	}
 }

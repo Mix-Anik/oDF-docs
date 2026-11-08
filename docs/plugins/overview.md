@@ -20,5 +20,6 @@ Operators and players are responsible for the plugins they install.
 
 ## Where to go next
 
-* [Architecture](architecture.mdx): the big picture, with diagrams of the sandbox and of where the API comes from.
-* [Client API](api/client.mdx) and [Server API](api/server.mdx): every function, handler and event.
+* **Writing a plugin:** [Getting started](guides/getting-started.md), then the [Examples](examples/index.md) and the [Client API](api/client.mdx) and [Server API](api/server.mdx), which list every function, handler and event.
+* **Using plugins:** [for players](players.md) (installing, switching on and off, cheats) and [for server operators](operators.md) (`sv_plugins`, capabilities, what a plugin may do).
+* **How it works:** [Architecture](architecture.mdx), the big picture with diagrams, and the [game module contract](internals.md) for people who write a mod or change the engine.
