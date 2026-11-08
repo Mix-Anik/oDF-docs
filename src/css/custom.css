@@ -35,3 +35,9 @@
 	display: table;
 	width: 100%;
 }
+
+/* What the engine itself says about a parameter (who reads or writes it, its size) follows what it is for, set apart. */
+.markdown .note-engine {
+	color: var(--ifm-color-emphasis-700);
+	font-size: 0.85em;
+}

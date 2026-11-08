@@ -11,10 +11,11 @@ export function registerApi(api, file, linker) {
 }
 
 export class ApiPage {
-	constructor(api, file, linker) {
+	constructor(api, file, linker, notes) {
 		this.api = api;
 		this.file = file;
 		this.linker = linker;
+		this.notes = notes;
 		this.restricted = new Set(api.caps.filter((c) => c.restricted).map((c) => c.name));
 	}
 
@@ -28,10 +29,23 @@ export class ApiPage {
 
 	// -- parameters ---------------------------------------------------------------------------------------------------
 
+	/** A hand-written note (content/param-notes.txt): `code` in it is code, and a name with a page of its own is a link. */
+	note(text, own) {
+		return text
+			.split(/(`[^`]+`)/)
+			.map((part) => {
+				if (!part.startsWith('`')) return this.inline(part, own);
+				const inner = part.slice(1, -1);
+				const base = inner.match(/^\w+/)?.[0];
+				return base && base !== own && this.linker.has(base) ? this.linker.link(base, this.file, part) : part;
+			})
+			.join('');
+	}
+
+	/** What the engine itself says about a parameter, as far as the type of it does not already (a string needs no note). */
 	paramNote(p) {
 		const note = [];
-		if (p.kind === 'str') note.push('string');
-		else if (p.kind === 'strv') note.push(`${code(p.count)} strings`);
+		if (p.kind === 'strv') note.push(`${code(p.count)} strings`);
 		else if (p.kind === 'fn') note.push(`handler, see ${this.linker.link(p.ctype, this.file)}`);
 		else if (p.kind === 'ptrin' || p.kind === 'ptrout') {
 			const direction = p.kind === 'ptrin' ? 'the engine reads it' : 'the engine writes it';
@@ -46,18 +60,24 @@ export class ApiPage {
 		return note.join(', ');
 	}
 
-	paramTable(params) {
+	/** The table of the parameters of `owner` (a function, handler type or export). Its last column is what each is for, then what
+	 * the engine says about it; a table where nothing is to be said has no such column. */
+	paramTable(params, owner) {
 		if (!params.length) return [];
-		const rows = params.flatMap((p) =>
-			p.kind === 'i64'
-				? [
-						[p.name + 'Lo', code('unsigned'), 'low half of a 64 bit number'],
-						[p.name + 'Hi', code('unsigned'), 'high half'],
-					]
-				: [[p.name, typeCell(p.cType, this.linker, this.file), this.paramNote(p)]],
-		);
-		const lines = rows.map(([n, t, note]) => `| ${code(n)} | ${t} | ${note.replaceAll('|', '\\|')} |`);
-		return ['| Parameter | Type | Notes |', '|---|---|---|', ...lines, ''];
+		const cell = (said, engine) => {
+			const parts = [said && this.note(said, owner), engine && `<span className="note-engine">${engine.replaceAll('|', '\\|')}</span>`];
+			return parts.filter(Boolean).join(' ');
+		};
+		const rows = params.flatMap((p) => {
+			const said = this.notes.get(owner, p.name);
+			if (p.kind !== 'i64') return [[p.name, typeCell(p.cType, this.linker, this.file), cell(said, this.paramNote(p))]];
+			return [
+				[p.name + 'Lo', code('unsigned'), cell(said, 'low half of a 64 bit number')],
+				[p.name + 'Hi', code('unsigned'), cell('', 'high half')],
+			];
+		});
+		if (!rows.some((r) => r[2])) return ['| Parameter | Type |', '|---|---|', ...rows.map(([n, t]) => `| ${code(n)} | ${t} |`), ''];
+		return ['| Parameter | Type | Description |', '|---|---|---|', ...rows.map(([n, t, d]) => `| ${code(n)} | ${t} | ${d} |`), ''];
 	}
 
 	// -- pieces -------------------------------------------------------------------------------------------------------
@@ -93,7 +113,7 @@ export class ApiPage {
 		o.push('```c', signature, '```', '');
 		const text = this.prose(item.doc, name);
 		if (text) o.push(text, '');
-		o.push(...this.paramTable(item.params));
+		o.push(...this.paramTable(item.params, name));
 		return o;
 	}
 

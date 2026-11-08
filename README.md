@@ -14,6 +14,8 @@ npm run build    # static site into build/
 * `docs/` the pages (markdown; `.md` is plain markdown, so C code and braces are safe). Add a page and list it in `sidebars.js`.
 * `content/examples/` the example pages, written by hand. A line `{{source name.c}}` in one is replaced by that file of the
   engine's SDK examples (`code/plugin_api/sdk/examples`), so the code shown is the code the engine's CI builds.
+* `content/param-notes.txt` what each parameter of the API is for (`Function.parameter: text`), the Description column of the
+  reference. A note for a function or parameter that no longer exists fails the build; a new parameter just has no note yet.
 * `docs/plugins/api/` and `docs/plugins/examples/` **generated, not committed**. `npm start` / `npm run build` run
   `scripts/generate.mjs`, which takes from the engine repo (oDFe-upstream)
   * the functions, handlers, events and capabilities, as data (`code/plugin_api/gen_api.py --json`, from `client.api` and

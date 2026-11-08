@@ -1,0 +1,167 @@
+# What a parameter means, for the Notes column of the API reference (scripts/render-api.mjs).
+#
+#   Function.parameter: text
+#
+# The function, handler or export is looked up by name in the client and the server API, and the note is shown there. What
+# the engine says on its own (a string, a buffer of N bytes, may be NULL, who reads or writes it) is added after it, so none of
+# that is repeated here. Say what the value is *for*, its unit, its range and what happens at the edges.
+# A line that continues the one above starts with a space. A note for a name that no longer exists fails the build.
+
+# -- both APIs --------------------------------------------------------------------------------------------------------------
+Print.text: The line to write. The plugin name is put in front of it and a newline after it.
+CvarRegister.name: Name of the cvar. Register it in OnInit; the plugin can read it back by this name.
+CvarRegister.defaultValue: Value used when the cvar does not exist yet. A value from a config file or the command line wins.
+CvarRegister.flags: A combination of the `ODFC_CVAR_*` (client) or `ODF_CVAR_*` (server) flags, 0 for none.
+CvarString.name: Name of a cvar the plugin registered, or one of the game settings it may read.
+CvarString.out: Receives the value. It is empty when the cvar does not exist or the plugin may not read it.
+CvarString.outSize: Size of `out`, in bytes, with the NUL.
+CvarInteger.name: Name of a cvar the plugin registered, or one of the game settings it may read. Gives 0 for any other.
+CvarValue.name: Name of a cvar the plugin registered, or one of the game settings it may read. Gives 0 for any other.
+Sin.x: Angle in radians.
+Cos.x: Angle in radians.
+Atan2.y: Sine part of the angle (the vertical distance).
+Atan2.x: Cosine part of the angle (the horizontal distance). The result is in radians, from -pi to pi.
+Sqrt.x: Gives 0 for zero and for a negative number, not an error.
+MemSet.dst: The memory of the plugin to fill.
+MemSet.value: The byte to fill it with (only the low 8 bits are used).
+MemSet.size: Number of bytes.
+MemCpy.dst: Where to copy to. It must not overlap `src`.
+MemCpy.src: Where to copy from.
+MemCpy.size: Number of bytes.
+
+# -- client: the game -------------------------------------------------------------------------------------------------------
+GetSnapshot.out: Receives the snapshot. Only valid when the return value is not 0.
+Trace.out: Receives the result. `fraction` is 1 and `endpos` is `end` when nothing was hit.
+Trace.start: Where the line begins, in map units.
+Trace.mins: Lower corner of the box to sweep, relative to the line. `NULL` is the same as 0 0 0.
+Trace.maxs: Upper corner of the box, like `mins`. With both `NULL` the trace is a thin line.
+Trace.end: Where the line ends, in map units.
+Trace.contentMask: What the trace can hit, a combination of `ODFC_CONTENTS_*` flags. `ODFC_MASK_SHOT` for missiles, `ODFC_MASK_PLAYERSOLID` for what stops a player.
+GetPlayerState.out: Receives the state. Only valid when the return value is not 0.
+GetMoveState.out: Receives the state. Only valid when the return value is not 0.
+PointContents.point: The position to look at, in map units.
+GetWeaponState.out: Receives the state. Only valid when the return value is not 0.
+GetPlayerStats.out: Receives the arrays. Only valid when the return value is not 0.
+
+# -- client: snapshots of the game ------------------------------------------------------------------------------------------
+SnapshotCreate.flags: Must be 0.
+SnapshotApply.handle: A handle from `SnapshotCreate`.
+SnapshotApply.flags: Must be 0.
+SnapshotFree.handle: A handle from `SnapshotCreate`.
+
+# -- client: drawing --------------------------------------------------------------------------------------------------------
+RegisterShader.name: Name of the shader, as in a .shader file or the path of a picture without the extension (`gfx/2d/bigchars`).
+RegisterShaderNoMip.name: Name of the shader or the path of a picture without the extension.
+RegisterModel.name: Path of the model, with the extension (`models/weapons2/rocketl/rocketl.md3`).
+AddPoly.shader: A handle from `RegisterShader`.
+AddPoly.numVerts: Number of vertices, 3 to 64. The polygon must be convex.
+AddPoly.verts: The vertices, in map units, one after the other around the polygon.
+AddBeam.shader: A handle from `RegisterShader`, a beam shader such as `railCore`.
+AddBeam.from: Start of the beam, in map units.
+AddBeam.to: End of the beam, in map units.
+AddBeam.rgba: Colour, red green blue alpha, each 0 to 255.
+SetColor.rgba: Red, green, blue, alpha, each 0.0 to 1.0. It applies to every picture drawn after it, until the next `SetColor`.
+DrawStretchPic.x: Left edge, in the 640x480 virtual screen.
+DrawStretchPic.y: Top edge, in the 640x480 virtual screen.
+DrawStretchPic.w: Width, in the 640x480 virtual screen.
+DrawStretchPic.h: Height, in the 640x480 virtual screen.
+DrawStretchPic.s1: Left edge of the part of the picture to show, 0.0 to 1.0.
+DrawStretchPic.t1: Top edge of the part of the picture to show, 0.0 to 1.0.
+DrawStretchPic.s2: Right edge of the part of the picture to show, 0.0 to 1.0.
+DrawStretchPic.t2: Bottom edge of the part of the picture to show, 0.0 to 1.0.
+DrawStretchPic.shader: A handle from `RegisterShader` or `RegisterShaderNoMip`.
+DrawModel.x: Left edge of the rectangle, in the 640x480 virtual screen.
+DrawModel.y: Top edge of the rectangle, in the 640x480 virtual screen.
+DrawModel.w: Width of the rectangle.
+DrawModel.h: Height of the rectangle.
+DrawModel.model: A handle from `RegisterModel`.
+DrawModel.origin: Where the model is, in front of the viewer, in model units.
+DrawModel.angles: How the model is turned: pitch, yaw, roll, in degrees.
+DrawModel.time: Animation time in ms, for a model that has frames.
+
+# -- client: console commands -----------------------------------------------------------------------------------------------
+CommandHandler.argc: Number of words, the command itself included. At most 16.
+CommandHandler.argv: The words, `argv[0]` is the command as it was typed. Each is cut after 199 characters.
+CommandRegister.name: The command, in lower case letters, digits and `_`, up to 31 long.
+CommandRegister.handler: Function that runs the command. A name that is taken (by the engine or another plugin) is refused.
+
+# -- client: ghosts and demos -----------------------------------------------------------------------------------------------
+GetGhostInfo.slot: Ghost slot, 0 to 4.
+GetGhostInfo.out: Receives the description. `numPoints` can still grow for a moment after a ghost has started.
+GetGhostPath.slot: Ghost slot, 0 to 4.
+GetGhostPath.first: Number of the first point to copy, counted from 0.
+GetGhostPath.count: How many points to copy at most. Fewer are given when the path ends sooner.
+GetGhostPath.out: Receives the points: room for `count` of them.
+DemoStop.discard: 0 keeps what was recorded, anything else throws it away.
+DemoSave.name: File name, without `demos/` and the extension. Folders are allowed.
+DemoState.out: Receives the state of the recording.
+
+# -- client: what the plugin implements -------------------------------------------------------------------------------------
+OnMapLoad.mapName: The map file as the game loaded it, like `maps/q3dm1.bsp`.
+OnDraw3D.view: The 3D view that is about to be rendered: where it is, which way it looks and its field of view.
+OnDraw2D.phase: Which of the two calls of the frame this is: `ODFC_DRAW2D_SCENE` or `ODFC_DRAW2D_FRAME`.
+OnFilterSound.entityNum: The entity that makes the sound. 1023 is the world.
+OnFilterSound.isLoop: 1 for a sound that loops on the entity, 0 for a single one.
+OnFilterSound.entityClientNum: Number of the player the entity belongs to, -1 if it is not a player or has not been in a snapshot yet.
+OnFilterSound.ownClientNum: Number of the player being watched. Compare with `entityClientNum` to find the player's own sounds.
+OnDemoSeek.fromTime: Server time before the move, in ms.
+OnDemoSeek.toTime: Server time after it, in ms. Smaller than `fromTime` when time went backwards.
+
+# -- server: clients --------------------------------------------------------------------------------------------------------
+RandomBytes.buf: Receives the random bytes.
+RandomBytes.len: Number of bytes.
+GetClientInfo.clientNum: Slot of the client, 0 to `sv_maxclients` - 1.
+GetClientInfo.out: Receives the description of the client.
+SendServerCommand.clientNum: The slot to send to, or -1 for everybody.
+SendServerCommand.command: What the client gets, `print "text\n"`, `cp "text"` or `chat "text"`. Anything else needs the capability `rawcmd`.
+
+# -- server: events and chat commands ---------------------------------------------------------------------------------------
+EventHandler.data: The values of the event, as an info string: `\key\value\key\value`. The keys of each event are listed under Events.
+EventSubscribe.name: Name of the event, in lower case letters, digits and `_`. See Events for the ones that exist.
+EventSubscribe.handler: Function called with the values of the event each time it happens.
+ChatCommandHandler.clientNum: Slot of the player who typed the command.
+ChatCommandHandler.serial: Connection counter of that slot: it changes when someone else takes it, so keep it with the slot if you answer later.
+ChatCommandHandler.args: What follows the command, trimmed, up to 200 characters. Empty when there is nothing.
+ChatCommandRegister.name: The command without the `!`, in lower case letters, digits and `_`, up to 31 long. Compared without regard to case.
+ChatCommandRegister.handler: Function called when a player types the command.
+
+# -- server: login ----------------------------------------------------------------------------------------------------------
+AuthResult.clientNum: Slot from the `auth_response` event.
+AuthResult.serial: Connection counter from the same event. If it does not match any more, the call is ignored.
+AuthResult.result: One of the `ODF_AUTHRES_*` values.
+AuthResult.accountID: Id of the account the player logged in as. Only used for `ODF_AUTHRES_OK`.
+AuthResult.accountName: Name of the account. Only used for `ODF_AUTHRES_OK`.
+AuthResult.reason: Why the login failed, a short word without spaces. The player is shown it for `ODF_AUTHRES_REJECTED`.
+
+# -- server: HTTP -----------------------------------------------------------------------------------------------------------
+HttpHandler.id: The number `HttpRequest` returned.
+HttpHandler.status: HTTP status of the answer, or 0 when there was none (timeout, host not reachable, answer too large).
+HttpHandler.bodyLen: Size of the answer in bytes. Read it with `HttpBody` before the handler returns.
+HttpHandler.userData: The number given to `HttpRequest`.
+HttpRequest.method: `ODF_HTTP_GET` or `ODF_HTTP_POST`.
+HttpRequest.url: The full URL. Its host must be one the operator listed in `http=`.
+HttpRequest.headers: Lines of `Name: value` separated by `\n`. Only `Authorization`, `Content-Type` and `Accept` are sent.
+HttpRequest.body: The body to send, for a POST.
+HttpRequest.bodyLen: Size of the body in bytes, 0 for none.
+HttpRequest.timeoutMs: How long to wait for the whole request, in ms.
+HttpRequest.handler: Function called when the request is done, in a later frame.
+HttpRequest.userData: Any number, handed back to the handler: an index into a table of the plugin's, for example.
+HttpBody.id: The number `HttpRequest` returned.
+HttpBody.offset: Byte of the answer to start copying at.
+HttpBody.out: Receives the bytes. Not ended with a NUL.
+HttpBody.outSize: Size of `out` in bytes.
+
+# -- server: storage --------------------------------------------------------------------------------------------------------
+StoreRead.name: File name: letters, digits, `.` `_` `-`, up to 63 long, not starting with a dot. There are no folders.
+StoreRead.offset: Byte of the file to start reading at, 0 for the beginning.
+StoreRead.out: Receives the bytes. Not ended with a NUL.
+StoreRead.outSize: Most bytes to read.
+StoreWrite.name: File name, as for `StoreRead`. The file is created if it is not there.
+StoreWrite.data: What to write.
+StoreWrite.len: Number of bytes, at most 1 MB in one call.
+StoreWrite.append: 0 replaces the file, 1 adds to its end.
+StoreSize.name: File name, as for `StoreRead`.
+StoreDelete.name: File name, as for `StoreRead`.
+
+# -- server: what the plugin implements -------------------------------------------------------------------------------------
+OnFrame.serverTime: The server time in ms, the same clock the game module uses.

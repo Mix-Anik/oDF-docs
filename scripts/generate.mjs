@@ -9,6 +9,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ApiPage, registerApi } from './render-api.mjs';
+import { Notes } from './notes.mjs';
 import { renderExamples } from './render-examples.mjs';
 import { parseHeader, registerTypes, TypesPage } from './render-types.mjs';
 import { Linker } from './text.mjs';
@@ -66,10 +67,12 @@ const loaded = MODULES.map(({ kind, position }) => {
 	return { kind, position, api, types, source, linker };
 });
 
+const notes = new Notes(resolve(root, 'content/param-notes.txt'));
+
 for (const { kind, position, api, types, source, linker } of loaded) {
 	const cap = kind[0].toUpperCase() + kind.slice(1);
 	const pages = [
-		[kind + '.mdx', new ApiPage(api, kind + '.mdx', linker).render({ title: `${cap} plugin API`, kind, position, typesFile: kind + '-types.mdx' })],
+		[kind + '.mdx', new ApiPage(api, kind + '.mdx', linker, notes).render({ title: `${cap} plugin API`, kind, position, typesFile: kind + '-types.mdx' })],
 		[kind + '-types.mdx', new TypesPage(types, kind + '-types.mdx', linker).render({ title: `${cap} types and constants`, kind, position: position + 1, source })],
 	];
 	for (const [name, text] of pages) {
@@ -78,4 +81,5 @@ for (const { kind, position, api, types, source, linker } of loaded) {
 	}
 }
 
+notes.check();
 renderExamples(resolve(root, 'content/examples'), resolve(apiDir, 'sdk/examples'), examplesOut);
