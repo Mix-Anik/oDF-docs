@@ -89,7 +89,7 @@ The code that runs a plugin is `code/qcommon/plugin_vm.c`, with small additions 
 
 ## Tests
 
-The engine has native tests that need no game (MSYS2 MinGW64 or any gcc; the ones with QVM programs need `q3lcc` and `q3asm`):
+The engine has native tests that need no game (MSYS2 MinGW64 or any gcc; the ones with QVM programs need `q3lcc` and `q3asm`, in the folder `Q3TOOLS` names, by default the `bin` folder of an `oDFs` checkout next to the engine repository). The `tests` workflow runs them for every pull request:
 
 | Test | What it checks |
 |---|---|
